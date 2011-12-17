@@ -1,0 +1,73 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{csquotes}
+\usepackage[ngerman]{babel}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{subfigure}
+\setcounter{secnumdepth}{-1} 
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{dsfont}
+\title{Betriebssysteme Vertiefung \\ Übung 5}
+
+\author{Dominik Eckelmann, Matr.-Nr.: 785856}
+\date{\today}
+
+\lstset{
+language=C,                % the language of the code
+numbers=left,                   % where to put the line-numbers
+numbersep=5pt,                  % how far the line-numbers are from the code
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+frame=single,                   % adds a frame around the code
+tabsize=2,                      % sets default tabsize to 2 spaces
+breaklines=true,                % sets automatic line breaking
+breakatwhitespace=false        % sets if automatic breaks should only happen at whitespace
+}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Einleitung}
+Als Teil der Lehrveranstaltung \textit{Betriebssysteme Vertiefung} im Wintersemester 2011/2012 an der \textit{Beuth Hochschule für Technik Berlin} sollte im Rahmen einer Übung mithilfe der Programmiersprache C ein Programm geschrieben werden, eine Datei kopiert. Hierbei soll ein Thread zum lesen der Datei, sowie ein Thread zum schreiben der Datei verwendet werden. Zudem soll ein Ringbuffer verwendet werden.
+
+\section{Problembeschreibung}
+Der Aufgabe liegt das Producer-Consumer Problem zugrunde.
+Zunächst einmal hat der Ringbuffer eine bestimmte Kapazität.
+Er wird vom produzierenden Thread mit Daten gefüllt.
+Der konsumierende Thread liest die Daten aus dem Buffer.
+Sobald einer der Threads das Ende erreicht, setzt er seine Arbeit
+am Anfang des Threads fort.
+
+Hierbei ist es wichtig darauf zu achten, dass der Produzierende Thread zunächst
+immer vor dem dem konsumierenden Thread startet und das die beiden Threads sich nicht
+überholen dürfen.
+
+\section{Lösungen}
+
+Zur Lösung in C werden zwei Semaphoren verwendet. 
+Eine Semaphore \texttt{write}, welche mit der größe des Ringbuffers abzüglich eins initialisiert wird. Die andere Semaphore \texttt{read}, mit der initialgröße 0.
+
+Die Semaphoren werden nun folgendermaßen verwendet:
+\begin{verbatim}
+Producer-Thread:
+    P(write)
+    Ringbuffer befüllen
+    V(read)
+Consumer-Thread:
+    P(read)
+    Aus Ringbuffer lesen
+    V(write)
+\end{verbatim}
+
+Wie klar ersichtlich blockieren sich die beiden Threads selbst und heben die Sperre je für den
+anderen auf. Auf diese Weiße wird sichergestellt das sich die beiden Threads nicht überholen.
+
+\end{document}
